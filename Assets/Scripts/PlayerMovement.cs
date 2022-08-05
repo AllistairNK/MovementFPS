@@ -146,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
             playerRb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force);
             if(playerRb.velocity.y > 0)
             {
-                playerRb.AddForce(Vector3.down * 80f, ForceMode.Impulse);
+                playerRb.AddForce(Vector3.down * 80f, ForceMode.Force);
             }
         }
         //on ground
@@ -160,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
             playerRb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
         }
         //turn off gravity while on slope
-        playerRb.useGravity = !OnSlope();
+        //playerRb.useGravity = !OnSlope();
     }
 
     private void SpeedControl()
@@ -201,11 +201,9 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.5f))
+        if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.2f))
         {
-            Debug.Log("onSlope");
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            Debug.Log(angle);
             return angle < maxSlopeAngle && angle != 0;
         }
         return false;
