@@ -53,13 +53,17 @@ public class PlayerMovement : MonoBehaviour
         air
     }
 
-
+    public RaycastHit floor;
+    public LineRenderer line;
+    public Transform pos1;
+    public Transform pos2;
 
     private void Start()
     {
         playerRb = GetComponent<Rigidbody>();
         playerRb.freezeRotation = true;
         startYScale = transform.localScale.y;
+        Physics.Raycast(transform.position, Vector3.down,out floor, playerHeight * 0.5f + 0.2f, whatIsGround);
     }
     private void FixedUpdate()
     {
@@ -80,6 +84,9 @@ public class PlayerMovement : MonoBehaviour
         {
             playerRb.drag = 0;
         }
+
+        line.SetPosition(0, pos1.position);
+        line.SetPosition(1, GetSlopeMoveDirection());
     }
 
 
@@ -143,11 +150,12 @@ public class PlayerMovement : MonoBehaviour
         if (OnSlope() && !exitingSlope)
         {
 
-            playerRb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force);
-            if(playerRb.velocity.y > 0)
-            {
+            playerRb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f , ForceMode.Force);
+            //if(playerRb.velocity.y > 0)
+            //{
                 playerRb.AddForce(Vector3.down * 80f, ForceMode.Force);
-            }
+                //transform.TransformDirection(transform.position.x,-0.2f,transform.position.z);
+            //}
         }
         //on ground
         if (grounded)
@@ -160,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
             playerRb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
         }
         //turn off gravity while on slope
-        //playerRb.useGravity = !OnSlope();
+        playerRb.useGravity = !OnSlope();
     }
 
     private void SpeedControl()
@@ -201,9 +209,11 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.2f))
+        if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            Debug.Log("onslope" + angle);
+            Debug.Log(angle < maxSlopeAngle && angle != 0);
             return angle < maxSlopeAngle && angle != 0;
         }
         return false;
@@ -211,6 +221,10 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 GetSlopeMoveDirection()
     {
+        Debug.DrawLine(transform.position, Vector3.ProjectOnPlane(moveDirection, floor.normal).normalized);
+        //Debug.DrawLine(transform.position, Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized);
+        //Debug.DrawRay(transform.position, Vector3.ProjectOnPlane(moveDirection, floor.normal).normalized);
+        Debug.Log(Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized);
         return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
     }
 }
