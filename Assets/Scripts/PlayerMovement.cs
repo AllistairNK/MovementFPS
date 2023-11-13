@@ -212,8 +212,8 @@ public class PlayerMovement : MonoBehaviour
         if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            Debug.Log("onslope" + angle);
-            Debug.Log(angle < maxSlopeAngle && angle != 0);
+            //Debug.Log("onslope" + angle);
+            //Debug.Log(angle < maxSlopeAngle && angle != 0);
             return angle < maxSlopeAngle && angle != 0;
         }
         return false;
@@ -221,10 +221,10 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 GetSlopeMoveDirection()
     {
-        Debug.DrawLine(transform.position, Vector3.ProjectOnPlane(moveDirection, floor.normal).normalized);
+        //Debug.DrawLine(transform.position, Vector3.ProjectOnPlane(moveDirection, floor.normal).normalized);
         //Debug.DrawLine(transform.position, Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized);
         //Debug.DrawRay(transform.position, Vector3.ProjectOnPlane(moveDirection, floor.normal).normalized);
-        Debug.Log(Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized);
+        //Debug.Log(Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized);
         return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
     }
 }

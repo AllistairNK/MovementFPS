@@ -2000,8 +2000,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2f5120abc7528499fe16519c291cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensX: 200
-  sensY: 200
+  sensX: 400
+  sensY: 400
   orientation: {fileID: 1321201858}
 --- !u!1 &975422824
 GameObject:
@@ -3831,7 +3831,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324702043}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
