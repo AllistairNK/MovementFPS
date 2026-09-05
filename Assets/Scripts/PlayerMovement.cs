@@ -79,10 +79,10 @@ public class PlayerMovement : MonoBehaviour
         //handle drag
         if (grounded)
         {
-            playerRb.drag = groundDrag;
+            playerRb.linearDamping = groundDrag;
         }else
         {
-            playerRb.drag = 0;
+            playerRb.linearDamping = 0;
         }
 
         line.SetPosition(0, pos1.position);
@@ -176,19 +176,19 @@ public class PlayerMovement : MonoBehaviour
         //limit velocity speed
         if (OnSlope() && !exitingSlope)
         {
-            if(playerRb.velocity.magnitude > moveSpeed)
+            if(playerRb.linearVelocity.magnitude > moveSpeed)
             {
-                playerRb.velocity = playerRb.velocity.normalized * moveSpeed;
+                playerRb.linearVelocity = playerRb.linearVelocity.normalized * moveSpeed;
             }
         }
         else
         {
-            Vector3 flatVel = new Vector3(playerRb.velocity.x, 0f, playerRb.velocity.z);
+            Vector3 flatVel = new Vector3(playerRb.linearVelocity.x, 0f, playerRb.linearVelocity.z);
             //limit velocity if needed
             if (flatVel.magnitude > moveSpeed)
             {
                 Vector3 limitedVel = flatVel.normalized * moveSpeed;
-                playerRb.velocity = new Vector3(limitedVel.x, playerRb.velocity.y, limitedVel.z);
+                playerRb.linearVelocity = new Vector3(limitedVel.x, playerRb.linearVelocity.y, limitedVel.z);
             }
         }
     }
@@ -197,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
     {
         exitingSlope = true;
         //reset y velocity
-        playerRb.velocity = new Vector3(playerRb.velocity.x, 0f, playerRb.velocity.z);
+        playerRb.linearVelocity = new Vector3(playerRb.linearVelocity.x, 0f, playerRb.linearVelocity.z);
         playerRb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
 
