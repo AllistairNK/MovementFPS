@@ -36,7 +36,14 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit slopeHit;
     private bool exitingSlope = false;
 
+    [Header("Slope Hysteresis")]
+    [Tooltip("Number of consecutive FixedUpdate frames the raw slope reading must disagree with the current state before it is allowed to flip. Prevents the movement force from jittering between slope-force and flat-ground force at ramp edges.")]
+    public int slopeHysteresisFrames = 2;
+    private bool cachedOnSlope;
+    private int slopeDisagreeFrames;
 
+    [Header("Debug")]
+    public bool debugSlopeLogging = false;
 
     public Transform orientation;
     float horizontalInput;
@@ -62,18 +69,19 @@ public class PlayerMovement : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         playerRb.freezeRotation = true;
+        playerRb.interpolation = RigidbodyInterpolation.Interpolate;
+        playerRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         startYScale = transform.localScale.y;
         Physics.Raycast(transform.position, Vector3.down,out floor, playerHeight * 0.5f + 0.2f, whatIsGround);
     }
     private void FixedUpdate()
     {
-        MovePlayer();
-    }
-    private void Update()
-    {
-        // ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-        MyInput();
+        // ground check (moved here so it stays in sync with the physics step that consumes it)
+        // SphereCast instead of a single-point Raycast: a point ray can miss right at the
+        // seam between two separate ground meshes (e.g. Floor -> Slope), flickering
+        // grounded state for a frame with no hysteresis to catch it.
+        grounded = Physics.SphereCast(transform.position, 0.2f, Vector3.down, out _, playerHeight * 0.5f + 0.2f, whatIsGround);
+        OnSlope(); // refreshes cachedOnSlope for this physics step
         SpeedControl();
         StateHandler();
         //handle drag
@@ -84,6 +92,11 @@ public class PlayerMovement : MonoBehaviour
         {
             playerRb.linearDamping = 0;
         }
+        MovePlayer();
+    }
+    private void Update()
+    {
+        MyInput();
 
         line.SetPosition(0, pos1.position);
         line.SetPosition(1, GetSlopeMoveDirection());
@@ -147,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
         //calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         //on slope
-        if (OnSlope() && !exitingSlope)
+        if (cachedOnSlope && !exitingSlope)
         {
 
             playerRb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f , ForceMode.Force);
@@ -168,13 +181,13 @@ public class PlayerMovement : MonoBehaviour
             playerRb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
         }
         //turn off gravity while on slope
-        playerRb.useGravity = !OnSlope();
+        playerRb.useGravity = !cachedOnSlope;
     }
 
     private void SpeedControl()
     {
         //limit velocity speed
-        if (OnSlope() && !exitingSlope)
+        if (cachedOnSlope && !exitingSlope)
         {
             if(playerRb.linearVelocity.magnitude > moveSpeed)
             {
@@ -209,14 +222,42 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
+        bool rawOnSlope;
         if(Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            //Debug.Log("onslope" + angle);
-            //Debug.Log(angle < maxSlopeAngle && angle != 0);
-            return angle < maxSlopeAngle && angle != 0;
+            rawOnSlope = angle < maxSlopeAngle && angle != 0;
         }
-        return false;
+        else
+        {
+            rawOnSlope = false;
+        }
+
+        // Hysteresis: only flip the cached state once the raw reading has disagreed
+        // for slopeHysteresisFrames in a row. Without this, a single-frame raycast
+        // flicker at a ramp edge or mesh seam swaps the movement force (slope-parallel
+        // vs. flat-ground) and gravity on/off abruptly, which is what produces the
+        // sudden forward "jump" during testing.
+        if (rawOnSlope == cachedOnSlope)
+        {
+            slopeDisagreeFrames = 0;
+        }
+        else
+        {
+            slopeDisagreeFrames++;
+            if (slopeDisagreeFrames >= slopeHysteresisFrames)
+            {
+                cachedOnSlope = rawOnSlope;
+                slopeDisagreeFrames = 0;
+            }
+        }
+
+        if (debugSlopeLogging)
+        {
+            Debug.Log($"[Slope] grounded={grounded} raw={rawOnSlope} cached={cachedOnSlope} angle={Vector3.Angle(Vector3.up, slopeHit.normal):F1}");
+        }
+
+        return cachedOnSlope;
     }
 
     private Vector3 GetSlopeMoveDirection()
