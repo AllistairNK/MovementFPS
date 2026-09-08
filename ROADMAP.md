@@ -37,6 +37,10 @@ Status legend: `[x]` done · `[~]` partial / placeholder in place · `[ ]` not s
       flash) when firing at nothing
 - [ ] Slide mechanic (crouch-while-sprinting momentum slide), a natural pairing
       with the existing slope-handling code
+- [ ] Gliding — an airborne state that slows fall speed and adds forward
+      control (parachute/wingsuit-style), likely triggered by holding a key
+      while airborne; pairs naturally with grapple-release momentum and the
+      ascending tower test course already in `GrappleTestArea`
 - [ ] Double jump / air dash as an optional traversal upgrade, gated behind a
       pickup or unlock if progression is added later
 
