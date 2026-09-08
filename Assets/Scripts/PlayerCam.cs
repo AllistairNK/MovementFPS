@@ -7,6 +7,9 @@ public class PlayerCam : MonoBehaviour
     public float sensX;
     public float sensY;
 
+    [Tooltip("Caps how many degrees the camera can turn in a single frame. Guards against a frame-time stutter (e.g. from a physics glitch) turning a normal mouse delta into a large, sudden rotation snap.")]
+    public float maxDegreesPerFrame = 15f;
+
     public Transform orientation;
 
     float xRotation;
@@ -20,8 +23,8 @@ public class PlayerCam : MonoBehaviour
 
     private void Update()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;
+        float mouseX = Mathf.Clamp(Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX, -maxDegreesPerFrame, maxDegreesPerFrame);
+        float mouseY = Mathf.Clamp(Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY, -maxDegreesPerFrame, maxDegreesPerFrame);
 
         yRotation += mouseX;
         xRotation -= mouseY;
