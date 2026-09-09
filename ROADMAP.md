@@ -41,8 +41,13 @@ Status legend: `[x]` done · `[~]` partial / placeholder in place · `[ ]` not s
       control (parachute/wingsuit-style), likely triggered by holding a key
       while airborne; pairs naturally with grapple-release momentum and the
       ascending tower test course already in `GrappleTestArea`
-- [ ] Double jump / air dash as an optional traversal upgrade, gated behind a
-      pickup or unlock if progression is added later
+- [ ] Double jump — a second in-air jump, reusing/extending the existing
+      `readyToJump`/`Jump()` flow in `PlayerMovement.cs`, gated behind a pickup
+      or unlock if progression is added later
+- [ ] Forward boost — a short burst of forward momentum (dash-style impulse
+      along look/move direction), usable on ground or in air; needs its own
+      cooldown and should be checked against the slope-force logic so it
+      doesn't fight the slope-stick force on activation
 
 ## Phase 2 — Combat
 
