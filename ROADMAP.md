@@ -94,6 +94,26 @@ Status legend: `[x]` done · `[~]` partial / placeholder in place · `[ ]` not s
 - [ ] Playtesting pass focused specifically on movement feel (grapple + wall-run +
       slide interplay) before locking level geometry
 
+## Phase 6 — VR port (stretch idea)
+
+- [ ] Evaluate whether the fast, physics-heavy movement set (grapple swinging,
+      wall-run, slide, gliding) is comfortable in VR at all before committing —
+      high-speed uncontrolled camera motion is a strong VR-sickness risk and may
+      need to be redesigned rather than ported as-is
+- [ ] Migrate input/camera to Unity's XR Interaction Toolkit (XR Origin, headset
+      tracking) alongside (not replacing) the existing keyboard/mouse path
+- [ ] Comfort mitigations to design in from the start if pursued: vignette/FOV
+      restriction during high-speed traversal (grapple swings, slides), decoupling
+      some camera roll/tilt from full 1:1 head tracking, snap-turn as an option
+- [ ] Grapple gun becomes a natural fit for motion controllers (aim/fire with a
+      physical point-and-trigger gesture) — likely the most VR-native mechanic
+      already in the project
+- [ ] Reuse the input-agnostic design lesson from the Dune worm project
+      ([[project_dune_worm_game]] — see `DUNE_WORM_GAME_DESIGN.md`): keep
+      mechanics decoupled from keyboard input from the start rather than
+      retrofitting VR onto a keyboard-first interaction layer later, since that
+      usually forces a rewrite
+
 ---
 
 ## Open design questions (revisit before Phase 2)
